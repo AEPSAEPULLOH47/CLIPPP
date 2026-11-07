@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>KaloClip AI Pro - Human Motion UGC Studio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <style>
+    @keyframes floatYellow {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .animate-basket { animation: floatYellow 1.6s ease-in-out infinite; }
+  </style>
+</head>
+<body class="bg-[#090d16] text-slate-100 min-h-screen font-sans pb-20">
+
+  <!-- Header -->
+  <header class="border-b border-slate-800 bg-[#0c1222]/90 backdrop-blur sticky top-0 z-50 px-4 py-2.5">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-rose-600 via-pink-600 to-amber-500 flex items-center justify-center text-white font-bold text-sm">
+          <i class="fa-solid fa-person-dress"></i>
+        </div>
+        <div>
+          <span class="text-base font-black tracking-tight text-white">Kalo<span class="text-rose-500">Clip</span></span>
+          <span class="text-[9px] bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold px-1.5 py-0.5 rounded ml-1">UGC HUMAN MOTION</span>
+        </div>
+      </div>
+      <div class="text-xs bg-slate-800 px-3 py-1 rounded-full text-slate-300 border border-slate-700">
+        <i class="fa-solid fa-video text-rose-500 mr-1"></i> Mode: <span id="currentPersonaLabel" class="text-amber-400 font-bold">Auto Detect</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Container -->
+  <main class="max-w-6xl mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-5">
+    
+    <!-- LEFT PANEL: Input & Studio Controls (Col 7) -->
+    <div class="lg:col-span-7 space-y-4">
+      
+      <!-- Input Link & Smart Niche Detector -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2 flex items-center justify-between">
+          <span><i class="fa-solid fa-link text-rose-500 mr-1.5"></i> Link Produk Marketplace</span>
+          <span class="text-[10px] text-slate-500">Auto Scraper & Human Match</span>
+        </h2>
+
+        <div class="space-y-3">
+          <input type="url" id="productLink" placeholder="Tempel link hijab, gamis, skincare, dll..." 
+                 class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-3 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-rose-500 transition">
+
+          <!-- Tombol Contoh Cepat Kategori -->
+          <div class="flex items-center gap-1.5 overflow-x-auto text-xs pb-1">
+            <span class="text-[10px] text-slate-500">Tes Langsung:</span>
+            <button onclick="setSample('hijab')" class="bg-rose-950/80 border border-rose-800/80 text-rose-300 px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap">
+              🧕 Hijab Bella Square
+            </button>
+            <button onclick="setSample('skincare')" class="bg-slate-800 border border-slate-700 text-slate-300 px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap">
+              ✨ Serum Wajah
+            </button>
+            <button onclick="setSample('gadget')" class="bg-slate-800 border border-slate-700 text-slate-300 px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap">
+              🎧 Earphone TWS
+            </button>
+          </div>
+
+          <button onclick="analyzeAndGenerate()" class="w-full bg-gradient-to-r from-rose-600 via-pink-600 to-amber-500 hover:brightness-110 active:scale-95 transition py-3.5 rounded-xl font-bold text-xs tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-rose-950">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> ANALISIS LINK & BUAT VIDEO HUMAN UGC
+          </button>
+        </div>
+      </div>
+
+      <!-- Human Motion & Persona Studio -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+            <i class="fa-solid fa-person-rays text-amber-400"></i> Karakter Model Manusia (UGC Creator)
+          </h3>
+          <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full font-bold">Gerakan Aktif</span>
+        </div>
+
+        <!-- Pemilihan Persona Model Manual/Auto -->
+        <div class="grid grid-cols-3 gap-2">
+          <button type="button" onclick="changePersona('hijab')" id="btnPersonaHijab" class="p-2.5 rounded-xl border border-rose-500 bg-rose-500/10 text-center transition">
+            <div class="text-xl mb-1">🧕</div>
+            <div class="text-[11px] font-bold text-white">Cewek Berhijab</div>
+            <div class="text-[9px] text-slate-400">Review Hijab/Gamis</div>
+          </button>
+          <button type="button" onclick="changePersona('beauty')" id="btnPersonaBeauty" class="p-2.5 rounded-xl border border-slate-800 bg-slate-950 text-center transition">
+            <div class="text-xl mb-1">👩</div>
+            <div class="text-[11px] font-bold text-white">Beauty Creator</div>
+            <div class="text-[9px] text-slate-400">Review Skincare/Makeup</div>
+          </button>
+          <button type="button" onclick="changePersona('tech')" id="btnPersonaTech" class="p-2.5 rounded-xl border border-slate-800 bg-slate-950 text-center transition">
+            <div class="text-xl mb-1">👨</div>
+            <div class="text-[11px] font-bold text-white">Tech / Casual</div>
+            <div class="text-[9px] text-slate-400">Elektronik & Umum</div>
+          </button>
+        </div>
+
+        <!-- Script 4-Adegan UGC TikTok -->
+        <div class="space-y-2 pt-1">
+          <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Naskah Penjelasan Model (Disesuaikan Niche)</label>
+          
+          <div class="space-y-2 text-xs">
+            <div class="bg-slate-950 p-2.5 rounded-xl border-l-4 border-amber-500 border-slate-800">
+              <span class="text-[10px] font-bold text-amber-400 block">[0-3s] Hook Gestur Penasaran:</span>
+              <input type="text" id="scriptHook" class="w-full bg-transparent border-0 p-0 text-xs text-slate-200 focus:ring-0 mt-0.5" value="Pantesan viral banget! Akhirnya nemu hijab yang tegak paripurna di dahi!">
+            </div>
+            <div class="bg-slate-950 p-2.5 rounded-xl border-l-4 border-cyan-500 border-slate-800">
+              <span class="text-[10px] font-bold text-cyan-400 block">[3-7s] Memperagakan Kelebihan Bahan:</span>
+              <input type="text" id="scriptBenefit" class="w-full bg-transparent border-0 p-0 text-xs text-slate-200 focus:ring-0 mt-0.5" value="Bahannya beneran adem, ironless gak gampang kusut, dan jatuhnya cantik banget pas dipakai!">
+            </div>
+            <div class="bg-slate-950 p-2.5 rounded-xl border-l-4 border-rose-500 border-slate-800">
+              <span class="text-[10px] font-bold text-rose-400 block">[7-11s] Gestur Menunjuk Keranjang Kuning:</span>
+              <input type="text" id="scriptCta" class="w-full bg-transparent border-0 p-0 text-xs text-slate-200 focus:ring-0 mt-0.5" value="Mumpung lagi promo beli 1 dapat 3, langsung checkout di keranjang kuning sekarang!">
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- RIGHT PANEL: Live 9:16 Video Canvas with Human Motion (Col 5) -->
+    <div class="lg:col-span-5 space-y-4">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-2xl sticky top-16">
+        
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse"></span>
+            <span class="text-xs font-bold text-slate-200">LIVE UGC SIMULATOR (9:16)</span>
+          </div>
+          <span id="exportBadge" class="hidden text-[10px] font-black text-rose-400 bg-rose-950/80 border border-rose-800 px-2 py-0.5 rounded-full">
+            ● MERENDER VIDEO...
+          </span>
+        </div>
+
+        <!-- Video 9:16 Frame -->
+        <div class="relative mx-auto rounded-3xl overflow-hidden shadow-2xl border-4 border-slate-800 bg-black aspect-[9/16] max-h-[460px] flex items-center justify-center">
+          <canvas id="ugcCanvas" width="720" height="1280" class="w-full h-full object-contain"></canvas>
+          
+          <!-- Tombol Stiker Keranjang Kuning Animasi -->
+          <div class="absolute left-3 bottom-24 animate-basket pointer-events-none">
+            <div class="bg-amber-400 text-slate-950 font-black text-[11px] px-3 py-1.5 rounded-xl shadow-lg flex items-center gap-1.5 border border-amber-300">
+              <i class="fa-solid fa-basket-shopping text-sm"></i>
+              <span>Keranjang Kuning</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Video & Audio Controls -->
+        <div class="mt-4 space-y-2">
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="startUgcVideo(false)" class="bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition active:scale-95 border border-slate-700">
+              <i class="fa-solid fa-play text-emerald-400"></i> Putar Video UGC
+            </button>
+            <button onclick="stopUgcVideo()" class="bg-slate-900 hover:bg-slate-800 text-slate-400 py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 border border-slate-800">
+              <i class="fa-solid fa-stop"></i> Berhenti
+            </button>
+          </div>
+
+          <!-- Download Action -->
+          <button onclick="startUgcVideo(true)" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black py-3 rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-950/40 active:scale-95 transition">
+            <i class="fa-solid fa-download text-sm"></i> DOWNLOAD VIDEO AFFILIATE (MP4)
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // State & Asset Foto Model Manusia (UGC Model)
+    let currentPersona = "hijab";
+    let isPlaying = false;
+    let animId;
+    let recordedBlobs = [];
+    let mediaRecorder;
+
+    // Aset Gambar Produk & Model UGC Berdasarkan Niche
+    let productImg = new Image();
+    productImg.crossOrigin = "anonymous";
+    productImg.src = "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=800&q=80"; // Default Hijab
+
+    // Model Kreator Manusia dengan Gerakan Konten
+    let modelImg = new Image();
+    modelImg.crossOrigin = "anonymous";
+    // Foto Kreator Hijab Indonesia dengan gestur menerangkan produk
+    modelImg.src = "https://images.unsplash.com/photo-1590402494682-cd3fb53b1f70?w=800&q=80"; 
+
+    window.addEventListener('DOMContentLoaded', () => {
+      productImg.onload = () => drawFrame(0, 0);
+    });
+
+    // 1. Pilih Contoh Kategori Cepat
+    function setSample(type) {
+      if (type === 'hijab') {
+        document.getElementById('productLink').value = "https://shopee.co.id/Pashmina-Ceruty-Babydoll-Tegak-Dahi-Premium";
+        changePersona('hijab');
+      } else if (type === 'skincare') {
+        document.getElementById('productLink').value = "https://tiktok.com/@shop/serum-brightening-anti-darkspot";
+        changePersona('beauty');
+      } else {
+        document.getElementById('productLink').value = "https://tokopedia.com/tws-bluetooth-low-latency-bass";
+        changePersona('tech');
+      }
+    }
+
+    // 2. Mengubah Model Manusia (Auto atau Manual)
+    function changePersona(type) {
+      currentPersona = type;
+      
+      // Reset button style
+      ['btnPersonaHijab', 'btnPersonaBeauty', 'btnPersonaTech'].forEach(id => {
+        document.getElementById(id).className = "p-2.5 rounded-xl border border-slate-800 bg-slate-950 text-center transition";
+      });
+
+      if (type === 'hijab') {
+        document.getElementById('btnPersonaHijab').className = "p-2.5 rounded-xl border border-rose-500 bg-rose-500/10 text-center transition";
+        document.getElementById('currentPersonaLabel').innerText = "Kreator Hijab 🧕";
+        
+        // Model Cewek Berhijab sedang menerangkan
+        modelImg.src = "https://images.unsplash.com/photo-1590402494682-cd3fb53b1f70?w=800&q=80";
+        productImg.src = "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=800&q=80";
+
+        // Skrip Spesifik Hijab
+        document.getElementById('scriptHook').value = "Pantesan viral banget! Akhirnya nemu hijab yang tegak paripurna di dahi!";
+        document.getElementById('scriptBenefit').value = "Bahannya beneran adem, ironless gak gampang kusut, dan menutup dada dengan rapi!";
+        document.getElementById('scriptCta').value = "Mumpung lagi promo diskon spesial, langsung checkout di keranjang kuning sekarang!";
+      } 
+      else if (type === 'beauty') {
+        document.getElementById('btnPersonaBeauty').className = "p-2.5 rounded-xl border border-rose-500 bg-rose-500/10 text-center transition";
+        document.getElementById('currentPersonaLabel').innerText = "Beauty Reviewer 👩";
+        
+        modelImg.src = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&q=80";
+        productImg.src = "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=800&q=80";
+
+        document.getElementById('scriptHook').value = "Stop scroll kalau kulit kamu lagi kusam dan banyak bekas jerawat!";
+        document.getElementById('scriptBenefit').value = "Serum ini ada kandungan Niacinamide 10%, bikin tekstur wajah halus dan glowing dalam 7 hari!";
+        document.getElementById('scriptCta').value = "Mumpung ready stock, ambil diskonnya di keranjang kuning kiri bawah!";
+      } 
+      else {
+        document.getElementById('btnPersonaTech').className = "p-2.5 rounded-xl border border-rose-500 bg-rose-500/10 text-center transition";
+        document.getElementById('currentPersonaLabel').innerText = "Tech Reviewer 👨";
+        
+        modelImg.src = "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=800&q=80";
+        productImg.src = "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80";
+
+        document.getElementById('scriptHook').value = "Nyesel banget baru tau ada gadget secanggih ini dengan harga semurah ini!";
+        document.getElementById('scriptBenefit').value = "Bass-nya nendang parah, sudah waterproof, dan baterainya tahan seharian penuh!";
+        document.getElementById('scriptCta').value = "Buruan co di keranjang kuning sebelum harganya balik normal ya!";
+      }
+
+      modelImg.onload = () => drawFrame(0, 0);
+    }
+
+    // 3. Analisis Link Otomatis (Mendeteksi Kata Kunci Hijab/Fashion)
+    function analyzeAndGenerate() {
+      const url = document.getElementById('productLink').value.toLowerCase();
+      if (!url) {
+        alert("Silakan masukkan link terlebih dahulu!");
+        return;
+      }
+
+      // Deteksi Otomatis Jika Produk Terkait Hijab
+      if (url.includes('hijab') || url.includes('pashmina') || url.includes('gamis') || url.includes('kerudung') || url.includes('khimar') || url.includes('jilbab')) {
+        changePersona('hijab');
+      } else if (url.includes('serum') || url.includes('cream') || url.includes('skincare') || url.includes('glow')) {
+        changePersona('beauty');
+      } else {
+        changePersona('tech');
+      }
+
+      startUgcVideo(false);
+    }
+
+    // 4. Render Layar Video Split-Screen ala Konten Kreator UGC TikTok
+    function drawFrame(sceneIdx, timeProgress) {
+      const canvas = document.getElementById('ugcCanvas');
+      const ctx = canvas.getContext('2d');
+      const W = canvas.width;
+      const H = canvas.height;
+
+      // Background Gelap
+      ctx.fillStyle = '#090d16';
+      ctx.fillRect(0, 0, W, H);
+
+      // === BAGIAN ATAS: Visual Showcase Produk (Zoom In Perlahan) ===
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(0, 0, W, H * 0.48);
+      ctx.clip();
+
+      if (productImg.complete) {
+        let zoom = 1.0 + (timeProgress * 0.06);
+        let pw = W * zoom;
+        let ph = (W * (productImg.height / productImg.width)) * zoom;
+        let px = (W - pw) / 2;
+        let py = (H * 0.48 - ph) / 2;
+        ctx.drawImage(productImg, px, py, pw, ph);
+      }
+      ctx.restore();
+
+      // Badge Kategori Produk di Atas
+      ctx.fillStyle = '#e11d48';
+      ctx.beginPath();
+      ctx.roundRect(30, 40, 220, 48, 24);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 20px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(currentPersona === 'hijab' ? 'HIJAB VIRAL FYP 🔥' : 'REKOMENDASI AI 🔥', 140, 72);
+
+      // Garis Pembatas Split-Screen
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(0, H * 0.48 - 4, W, 8);
+
+      // === BAGIAN BAWAH: Model Kreator Manusia (Motion Bergerak & Berbicara) ===
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(0, H * 0.48, W, H * 0.52);
+      ctx.clip();
+
+      if (modelImg.complete) {
+        // Simulasi Motion Gerak Tubuh & Kepala Kreator Konten
+        let headSway = Math.sin(Date.now() / 250) * 12; // Gerakan kepala berbicara
+        let breathing = Math.sin(Date.now() / 500) * 6;  // Gerakan gestur tubuh
+        
+        let mw = W * 1.1;
+        let mh = mw * (modelImg.height / modelImg.width);
+        let mx = (W - mw) / 2 + headSway;
+        let my = H * 0.48 + breathing - 20;
+
+        ctx.drawImage(modelImg, mx, my, mw, mh);
+      }
+      ctx.restore();
+
+      // Indikator Model Sedang Berbicara (Gelombang Suara AI)
+      if (isPlaying) {
+        ctx.fillStyle = 'rgba(0,0,0,0.6)';
+        ctx.beginPath();
+        ctx.roundRect(W - 210, H * 0.48 + 20, 180, 40, 20);
+        ctx.fill();
+
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = 'bold 16px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('🎙️ Live Creator UGC', W - 120, H * 0.48 + 46);
+      }
+
+      // === SUBTITLE CAPCUT GAYA TIKTOK (Bawah Layar) ===
+      ctx.save();
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.88)';
+      ctx.beginPath();
+      ctx.roundRect(25, H - 240, W - 50, 140, 20);
+      ctx.fill();
+      ctx.strokeStyle = '#facc15';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      let text = "";
+      if (sceneIdx === 0) text = document.getElementById('scriptHook').value;
+      else if (sceneIdx === 1) text = document.getElementById('scriptBenefit').value;
+      else text = document.getElementById('scriptCta').value;
+
+      ctx.fillStyle = '#facc15';
+      ctx.font = '900 30px sans-serif';
+      ctx.textAlign = 'center';
+      wrapText(ctx, text, W / 2, H - 180, W - 90, 42);
+      ctx.restore();
+    }
+
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+      const words = text.split(' ');
+      let line = '';
+      for (let n = 0; n < words.length; n++) {
+        let testLine = line + words[n] + ' ';
+        let metrics = ctx.measureText(testLine);
+        if (metrics.width > maxWidth && n > 0) {
+          ctx.fillText(line, x, y);
+          line = words[n] + ' ';
+          y += lineHeight;
+        } else {
+          line = testLine;
+        }
+      }
+      ctx.fillText(line, x, y);
+    }
+
+    // 5. Playback & Export Engine
+    function startUgcVideo(isExport = false) {
+      stopUgcVideo();
+      isPlaying = true;
+
+      const script1 = document.getElementById('scriptHook').value;
+      const script2 = document.getElementById('scriptBenefit').value;
+      const script3 = document.getElementById('scriptCta').value;
+      const fullText = `${script1}. ${script2}. ${script3}`;
+
+      const utterance = new SpeechSynthesisUtterance(fullText);
+      utterance.lang = 'id-ID';
+      utterance.rate = 1.08; // Cepat & natural khas review TikTok
+
+      if (isExport) {
+        document.getElementById('exportBadge').classList.remove('hidden');
+        recordedBlobs = [];
+        const canvas = document.getElementById('ugcCanvas');
+        const stream = canvas.captureStream(30);
+        let mime = MediaRecorder.isTypeSupported('video/webm') ? 'video/webm' : 'video/mp4';
+
+        try {
+          mediaRecorder = new MediaRecorder(stream, { mimeType: mime });
+          mediaRecorder.ondataavailable = (e) => {
+            if (e.data.size > 0) recordedBlobs.push(e.data);
+          };
+          mediaRecorder.onstop = () => {
+            document.getElementById('exportBadge').classList.add('hidden');
+            const blob = new Blob(recordedBlobs, { type: mime });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `UGC_Hijab_Affiliate_${Date.now()}.webm`;
+            a.click();
+            alert("Video Kreator UGC berhasil diunduh ke galeri HP kamu!");
+          };
+          mediaRecorder.start();
+        } catch (e) {}
+      }
+
+      let start = Date.now();
+      const totalDuration = 11000; // 11 detik
+
+      function animate() {
+        if (!isPlaying) return;
+        let elapsed = Date.now() - start;
+        let progress = (elapsed % 3600) / 3600;
+        let sceneIdx = Math.min(Math.floor(elapsed / 3600), 2);
+
+        drawFrame(sceneIdx, progress);
+
+        if (elapsed < totalDuration) {
+          animId = requestAnimationFrame(animate);
+        } else {
+          stopUgcVideo();
+          if (isExport && mediaRecorder && mediaRecorder.state !== 'inactive') {
+            mediaRecorder.stop();
+          }
+        }
+      }
+
+      window.speechSynthesis.speak(utterance);
+      animId = requestAnimationFrame(animate);
+    }
+
+    function stopUgcVideo() {
+      isPlaying = false;
+      cancelAnimationFrame(animId);
+      window.speechSynthesis.cancel();
+      document.getElementById('exportBadge').classList.add('hidden');
+      drawFrame(0, 0);
+    }
+  </script>
+</body>
+</html>
